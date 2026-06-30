@@ -7,11 +7,14 @@ import sys
 from .config import DEFAULT_SOUND_PATH
 
 
-def play_done_sound(sound_path: str = DEFAULT_SOUND_PATH) -> bool:
+def play_done_sound(sound_path: str = DEFAULT_SOUND_PATH, wait: bool = True) -> bool:
     """Play the completion sound, returning whether afplay was used."""
     if shutil.which("afplay"):
         try:
-            subprocess.run(["afplay", sound_path], check=False)
+            if wait:
+                subprocess.run(["afplay", sound_path], check=False)
+            else:
+                subprocess.Popen(["afplay", sound_path])
             return True
         except OSError:
             pass

@@ -19,11 +19,17 @@ class Action:
     DONE = "done"
 
 
-def run_timer(timer: Timer, on_finish, segments: int = DEFAULT_SEGMENTS) -> str:
-    return curses.wrapper(_run, timer, on_finish, segments)
+def run_timer(
+    timer: Timer,
+    on_finish,
+    segments: int = DEFAULT_SEGMENTS,
+    title: str = "POMODORO",
+    wait_on_finish: bool = True,
+) -> str:
+    return curses.wrapper(_run, timer, on_finish, segments, title, wait_on_finish)
 
 
-def _run(stdscr, timer: Timer, on_finish, segments: int) -> str:
+def _run(stdscr, timer: Timer, on_finish, segments: int, title: str, wait_on_finish: bool) -> str:
     curses.curs_set(0)
     stdscr.nodelay(True)
     stdscr.timeout(0)
@@ -35,9 +41,11 @@ def _run(stdscr, timer: Timer, on_finish, segments: int) -> str:
     while True:
         if timer.is_finished and not sound_played:
             on_finish()
+            if not wait_on_finish:
+                return Action.DONE
             sound_played = True
 
-        _draw(stdscr, timer, segments, sound_played)
+        _draw(stdscr, timer, segments, sound_played, title)
         key = stdscr.getch()
 
         if key in (ord("q"), ord("Q"), 3):
@@ -53,11 +61,10 @@ def _run(stdscr, timer: Timer, on_finish, segments: int) -> str:
         time.sleep(TICK_INTERVAL_SEC)
 
 
-def _draw(stdscr, timer: Timer, segments: int, sound_played: bool) -> None:
+def _draw(stdscr, timer: Timer, segments: int, sound_played: bool, title: str = "POMODORO") -> None:
     stdscr.erase()
     height, width = stdscr.getmaxyx()
 
-    title = "POMODORO"
     status = _status_label(timer, sound_played)
     time_text = "DONE" if timer.state == TimerState.FINISHED else format_remaining(timer.remaining_seconds)
     help_text = "p: pause/resume   r: restart   q: quit"

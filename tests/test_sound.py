@@ -11,6 +11,16 @@ def test_play_done_sound_uses_afplay_when_available(monkeypatch) -> None:
     assert calls == [(["afplay", "/tmp/done.aiff"], False)]
 
 
+def test_play_done_sound_can_start_afplay_without_waiting(monkeypatch) -> None:
+    calls = []
+
+    monkeypatch.setattr(sound.shutil, "which", lambda name: "/usr/bin/afplay")
+    monkeypatch.setattr(sound.subprocess, "Popen", lambda args: calls.append(args))
+
+    assert sound.play_done_sound("/tmp/done.aiff", wait=False) is True
+    assert calls == [["afplay", "/tmp/done.aiff"]]
+
+
 def test_play_done_sound_falls_back_to_bell(monkeypatch) -> None:
     writes = []
 

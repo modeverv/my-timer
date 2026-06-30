@@ -24,6 +24,7 @@ pomo 5
 ```
 
 タイマー終了時には macOS の `afplay` で音を鳴らす。
+あわせて `osascript` で通知センターにも通知を出す。
 
 ## 特徴
 
@@ -31,6 +32,9 @@ pomo 5
 - TUIで残り時間を表示。
 - セグメント型プログレスバーを表示。
 - 同梱したフリー音源を `afplay` で再生する終了音。
+- `osascript` によるmacOS通知。
+- `--cycle` で作業/休憩を繰り返すポモドーロサイクル。
+- `--long-break` と `--rounds` で長休憩を挟める。
 - 色対応ターミナルでは、進捗バーを緑、黄、赤、暗色で表示。
 - `p` で一時停止/再開。
 - `r` でリスタート。
@@ -42,14 +46,16 @@ pomo 5
 - macOS
 - Python 3.10以上
 - `afplay`
+- `osascript`
 - curses対応ターミナル
 
-macOSには通常 `afplay` が最初から入っている。
+macOSには通常 `afplay` と `osascript` が最初から入っている。
 
 確認:
 
 ```sh
 which afplay
+which osascript
 ```
 
 ## インストール
@@ -90,6 +96,25 @@ pomo 25
 pomo 5
 ```
 
+### ポモドーロサイクル
+
+作業25分、休憩5分を繰り返す。
+
+```sh
+pomo --cycle 25 5
+```
+
+作業と休憩は、各セッションが終わると自動で次へ進む。
+`q` または `Ctrl-C` でサイクル全体を終了する。
+
+### 長休憩
+
+4セットごとに15分休憩する。
+
+```sh
+pomo --work 25 --break 5 --long-break 15 --rounds 4
+```
+
 ### 引数なしで起動
 
 ```sh
@@ -127,7 +152,13 @@ pomo/assets/alarm-or-siren.mp3
 afplay pomo/assets/alarm-or-siren.mp3
 ```
 
-将来的には `--sound` オプションで変更可能にする。
+さらにmacOS通知センターへ以下と同等の通知を出す。
+
+```sh
+osascript -e 'display notification "Timer finished" with title "pomo"'
+```
+
+`--sound` オプションで変更できる。
 
 ```sh
 pomo 25 --sound /System/Library/Sounds/Ping.aiff
