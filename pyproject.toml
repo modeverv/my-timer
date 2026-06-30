@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pomo-tui"
+version = "0.1.0"
+description = "A small terminal pomodoro timer."
+requires-python = ">=3.10"
+readme = "README.md"
+license = { text = "MIT" }
+
+[project.scripts]
+pomo = "pomo.app:main"
+
+[tool.setuptools.package-data]
+pomo = ["assets/*.mp3"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

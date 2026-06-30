@@ -1,0 +1,16 @@
+#!/bin/sh
+set -eu
+
+source_path=$0
+while [ -L "$source_path" ]; do
+  link_dir=$(CDPATH= cd -- "$(dirname -- "$source_path")" && pwd)
+  link_target=$(readlink "$source_path")
+  case "$link_target" in
+    /*) source_path=$link_target ;;
+    *) source_path=$link_dir/$link_target ;;
+  esac
+done
+
+script_dir=$(CDPATH= cd -- "$(dirname -- "$source_path")" && pwd)
+repo_root=$(CDPATH= cd -- "$script_dir/.." && pwd)
+PYTHONPATH="$repo_root${PYTHONPATH:+:$PYTHONPATH}" exec python3 -m pomo "$@"
